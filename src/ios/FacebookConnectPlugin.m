@@ -200,6 +200,44 @@
 
 }
 
+
+-(void) checkPermissions:(CDVInvokedUrlCommand*)command
+{
+
+    if ([command.arguments count] == 0) {
+        CDVPluginResult *pluginResult;
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                         messageAsString:@"No method provided"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
+    
+    NSMutableDictionary *options = [[command.arguments lastObject] mutableCopy];
+    NSString* method = options[@"method"];
+    if (!method) {
+        CDVPluginResult *pluginResult;
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                         messageAsString:@"No method provided"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
+    
+    [options removeObjectForKey:@"method"];
+    NSDictionary *params = [options copy];
+
+    NSSet *grantedPermissions = [FBSDKAccessToken currentAccessToken].permissions; //gets current list of permissions
+    if ([grantedPermissions containsObject:params]) { //checks if permissions exists
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
+}
+
+
 - (void) logout:(CDVInvokedUrlCommand*)command
 {
     if ([FBSDKAccessToken currentAccessToken]) {
