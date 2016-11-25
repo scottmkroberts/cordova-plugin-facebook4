@@ -23,6 +23,7 @@
 - (void)login:(CDVInvokedUrlCommand *)command;
 - (void)logout:(CDVInvokedUrlCommand *)command;
 - (void)graphApi:(CDVInvokedUrlCommand *)command;
+- (void) checkPermissions:(CDVInvokedUrlCommand*)command 
 - (void)showDialog:(CDVInvokedUrlCommand *)command;
 - (void)appInvite:(CDVInvokedUrlCommand *) command;
 - (void)getDeferredApplink:(CDVInvokedUrlCommand *) command;
