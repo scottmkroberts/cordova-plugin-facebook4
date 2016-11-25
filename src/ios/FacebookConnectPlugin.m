@@ -200,9 +200,29 @@
 
 }
 
+- (void) checkHasCorrectPermissions:(CDVInvokedUrlCommand*)command{
+    
+    NSArray *permissions = ["email","user_friends","user_likes","user_birthday","user_photos"];
+    NSSet *grantedPermissions = [FBSDKAccessToken currentAccessToken].permissions; //gets current list of permissions
+
+    for (NSString value in permissions) {
+        if !([grantedPermissions containsObject:value]) { //checks if permissions does not exists
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            return;
+        }
+    }
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    return;
+}
+
 
 -(void) checkPermissions:(CDVInvokedUrlCommand*)command
 {
+    
+    //["email","user_friends","user_likes","user_birthday","user_photos”]
 
     if ([command.arguments count] == 0) {
         CDVPluginResult *pluginResult;
@@ -226,15 +246,22 @@
     NSDictionary *params = [options copy];
 
     NSSet *grantedPermissions = [FBSDKAccessToken currentAccessToken].permissions; //gets current list of permissions
-    if ([grantedPermissions containsObject:params]) { //checks if permissions exists
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        return;
-    } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        return;
+    
+    for (NSString* key in params) {
+        NSString value = [xyz objectForKey:key];
+        
+        if !([grantedPermissions containsObject:value]) { //checks if permissions exists
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            return;
+        }
+        
     }
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    return;
+    
 }
 
 
